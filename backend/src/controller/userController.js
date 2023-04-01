@@ -2,6 +2,58 @@ const jwt = require ('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const { query } = require('../config/sql/sqlQuery');
+// input validations
+const { validateSuperAdminRegisterInput } = require('../utilities/validations') 
+const { sendOTP } = require('../utilities/emailingFunctionalities')
+
+
+
+
+// @Register a super_admin
+// @Route POST api/users/registerSuperAdmin
+// @access Public
+const registerSuperAdmin = asyncHandler(async (req, res) => {
+    const userInput = req.body;
+    const validateInput = validateSuperAdminRegisterInput(userInput);
+
+    if (!validateInput.success) {
+        res.status(400);
+        throw new Error(validateInput.message);
+    };
+
+// check if email is already registered
+    const isUserExists = await query(` SELECT EXISTS ( SELECT 1 FROM "user" WHERE email = '${req.body.email}' UNION SELECT 1 FROM temp_user WHERE email = '${req.body.email}' ) as user_exists`);
+    if (isUserExists[0].user_exists) {
+        res.status(400)
+        throw new Error(`Email ${req.body.email} already registered.`);
+    }
+
+    const { firstName, lastName, email, phone, password, organisation, team, designation, projectName } = userInput;
+    const otp = Math.floor(Math.random() * 90000) + 10000;
+    const role = 1;
+    const is_verified = false;
+
+    // send OTP to user email
+    const sendOTPEmail = await sendOTP(email, otp);
+    if(sendOTPEmail.status !== 'success'){
+        res.status(400);
+        throw new Error(`An error occured while sending email, please contact admin if email is valid.`);
+    }
+
+    // save user credentials to db
+    const sqlQuery = `INSERT INTO temp_user (first_name, last_name, email, phone, "password", "role", organisation, team, designation, otp, is_verified, project_name)
+                            VALUES('${firstName}', '${lastName}', '${email}', '${phone}', '${password}', ${role}, '${organisation}', '${team}', '${designation}', '${otp}', ${is_verified}, '${projectName}')
+                            RETURNING first_name, last_name, email, phone, role, organisation, team, designation, otp, is_verified, project_name`;
+
+    try {
+        // execute the sql query using your database library and return the inserted user object
+        const result = await query(sqlQuery);
+        res.status(201).json({ success: true, data: result[0] });
+    } catch (error) {
+        res.status(500)
+        throw new Error(`An error occured while saving to database.`);
+    }
+});
 
 
 
@@ -57,31 +109,41 @@ const generateToken = (id) =>{
     })
 }
 
-const testFunction = async () => {
 
-    try {
-        const result = await query(`
-          INSERT INTO "users" (first_name, last_name, email, phone, "password", organisation, team, designation, is_verified, is_active, role_id)
-          VALUES('Jennita', 'Manuel', 'james007123566@gmail.com', '4158002317', 'test&356hd', 'AIMA', 'cREDEBN', 'MANAGER', true, true, 1)
-          RETURNING *;
-        `);
 
-        const resultKeys = Object.keys(result);
-        console.log(result.code)
-        console.log(resultKeys)
+
+
+
+
+
+
+
+
+// const testFunction = async () => {
+
+//     try {
+//         const result = await query(`
+//           INSERT INTO "users" (first_name, last_name, email, phone, "password", organisation, team, designation, is_verified, is_active, role_id)
+//           VALUES('Jennita', 'Manuel', 'james007123566@gmail.com', '4158002317', 'test&356hd', 'AIMA', 'cREDEBN', 'MANAGER', true, true, 1)
+//           RETURNING *;
+//         `);
+
+//         const resultKeys = Object.keys(result);
+//         console.log(result.code)
+//         console.log(resultKeys)
         
-        // console.log('From try block', resultKeys);
-      } catch (error) {
-        console.log('ERROR:', error);
+//         // console.log('From try block', resultKeys);
+//       } catch (error) {
+//         console.log('ERROR:', error);
         
 
-      }
+//       }
       
 
 
-}
+// }
 
-testFunction();
+// testFunction();
 
 
 
@@ -92,6 +154,7 @@ testFunction();
 
 
 module.exports = {
+    registerSuperAdmin,
     loginUser,
     getMyInfo
 }

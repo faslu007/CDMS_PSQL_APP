@@ -5,7 +5,7 @@ const dotenv = require('dotenv').config();
 const cors = require('cors');
 const compression = require('compression') // compress req & res data transfer
 const path = require("path");
-const {errorHandler} = require('./middlewares/errorMiddleware')
+const { errorHandler } = require('./middlewares/errorMiddleware')
 const app = express();
 
 // for parsing application/json
@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 // for parsing application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 
 // app.use(upload.array());
 
@@ -37,4 +37,4 @@ app.use('/api/users', require('./routes/userRoutes'));
 // error handler middleware - return structured error message - this should be always placed beneath the routes to work
 app.use(errorHandler);
 
-app.listen(port, ()=> console.log(`Server started on ${port}`));
+app.listen(port, () => console.log(`Server started on ${port}`));
