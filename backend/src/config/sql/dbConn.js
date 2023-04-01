@@ -9,7 +9,7 @@ const pool = new Pool({
   connectionString: dbConnectionString,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 15000,
   ssl: { sslmode: 'require' },
 });
 
