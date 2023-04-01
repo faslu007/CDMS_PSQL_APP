@@ -57,6 +57,40 @@ const generateToken = (id) =>{
     })
 }
 
+const testFunction = async () => {
+
+    try {
+        const result = await query(`
+          INSERT INTO "users" (first_name, last_name, email, phone, "password", organisation, team, designation, is_verified, is_active, role_id)
+          VALUES('Jennita', 'Manuel', 'james007123566@gmail.com', '4158002317', 'test&356hd', 'AIMA', 'cREDEBN', 'MANAGER', true, true, 1)
+          RETURNING *;
+        `);
+
+        const resultKeys = Object.keys(result);
+        console.log(result.code)
+        console.log(resultKeys)
+        
+        // console.log('From try block', resultKeys);
+      } catch (error) {
+        console.log('ERROR:', error);
+        
+
+      }
+      
+
+
+}
+
+testFunction();
+
+
+
+
+
+
+
+
+
 module.exports = {
     loginUser,
     getMyInfo
