@@ -31,11 +31,24 @@ function generateProjectCode(projectName) {
 
 
 // generate JWT Token on success login & register with expiry 5 days
-const generateJWT = (user_id, permissions, project_id) => {
-    return jwt.sign({ id: user_id, permissions, project_id }, process.env.JWT_SECRET, {
+const generateJWT = (user_id, project_id) => {
+    return jwt.sign({ id: user_id, project_id: project_id }, process.env.JWT_SECRET, {
         expiresIn: '5d',
     });
 };
+
+// generate password 
+function generatePassword() {
+    let pass = '';
+    let str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+        'abcdefghijklmnopqrstuvwxyz0123456789@#$';
+    for (let i = 1; i <= 8; i++) {
+        var char = Math.floor(Math.random()
+            * str.length + 1);
+        pass += str.charAt(char)
+    }
+    return pass;
+}
 
 
 
@@ -43,5 +56,6 @@ const generateJWT = (user_id, permissions, project_id) => {
 
 module.exports = {
     generateProjectCode,
-    generateJWT
+    generateJWT,
+    generatePassword
 }  
