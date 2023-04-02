@@ -25,6 +25,7 @@ async function exportUsersToRedis() {
             const userIdKey = `user:${user.user_id}`;
             const emailKey = `user:${user.email}`;
             const redisUser = {
+                id: user.user_id,
                 first_name: user.first_name,
                 last_name: user.last_name,
                 full_name: user.full_name,
@@ -55,7 +56,6 @@ async function exportUsersToRedis() {
     }
 };
 
-// const protect = asyncHandler(async (req, res, next) => {
 // middleware function to get user from redis if exists in redis cache for logging in
 const checkInRedisCache = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
@@ -73,8 +73,8 @@ const checkInRedisCache = asyncHandler(async (req, res, next) => {
             const user = JSON.parse(cachedUser);
             if (user.password && (await bcrypt.compare(password, user.password))) {
                 delete user.password;
-                user.token = generateJWT(user.user_id, user.permission_ids, user.project_id);
-                res.status(200).json(user);
+                user.token = generateJWT(user.id);
+                res.status(200).json({ success: true, data: user });
             }
         } else {
             return next();
@@ -90,7 +90,6 @@ const checkInRedisCache = asyncHandler(async (req, res, next) => {
 const getUserForAuthMiddleware = asyncHandler(async (req, res, next) => {
     try {
         await redisClient.connect();
-
         const cachedUser = await redisClient.get(`user:${req.user_id}`);
         if (cachedUser) {
             req.user = JSON.parse(cachedUser);
