@@ -41,6 +41,31 @@ const sendOTP = async (email, otp) => {
 };
 
 
+// async function to send the Temp password - this is called from the ..controller/userController.js - register-user
+const sendTempPassword = async (tempUser, tempPassword, admin) => {
+    try {
+        // Email Template
+        const options = {
+            from: "luciano.jakubowski29@ethereal.email",
+            to: email,
+            subject: "Credential Pro App - Email Verification",
+            text: `Your OTP for email verification is ${otp}.`,
+            html: `<p>Hello,</p>
+              <p>Dear ${tempUser.first_name}.</p>
+              <p>Admin ${admin} has registered your email address with Credential-pro app.</p>
+              <p>Your Temporary Password for email verification is <strong>${tempPassword}</strong>.</p>`
+        };
+
+        const response = await transporter.sendMail(options);
+        return { status: 'success' };
+
+    } catch (error) {
+        throw new Error("An error occurred while sending email. `${error.response");
+    }
+};
+
+
 module.exports = {
     sendOTP,
+    sendTempPassword
 }

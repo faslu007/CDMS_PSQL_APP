@@ -33,6 +33,35 @@ const validateSuperAdminRegisterInput = (userInput) => {
 };
 
 
+// user registration input validation;
+const validateUserRegistrationInput = (userInput) => {
+  const { firstName, lastName, email, phone, designation, role } = userInput;
+  const missingFields = [];
+
+  if (!firstName) missingFields.push("First name");
+  if (!lastName) missingFields.push("Last name");
+  if (!email) missingFields.push("Email");
+  if (!phone) missingFields.push("Phone");
+  if (!role) missingFields.push("User Role");
+  if (!designation) missingFields.push("Designation");
+
+  if (email && !validateEmail(email)) {
+    missingFields.push("Invalid email address");
+  };
+
+  if (missingFields.length > 0) {
+    return {
+      success: false,
+      message: `The following fields are missing or invalid: ${missingFields.join(", ")}`,
+    };
+  };
+
+  return {
+    success: true,
+  };
+}
+
+
 
 // password validation
 function checkStrongPassword(str) {
@@ -58,5 +87,6 @@ function validatePhone(phoneNumber) {
 
 module.exports = {
   validateSuperAdminRegisterInput,
-  checkStrongPassword
+  validateUserRegistrationInput,
+  checkStrongPassword,
 }
