@@ -170,8 +170,8 @@ const loginUser = asyncHandler(async (req, res) => {
     // validate password and send response;
     if (userData && (await bcrypt.compare(password, userData.password))) {
         delete userData.password;
-        userData.token = generateJWT(userData.user_id, userData.project_id);
-        res.status(200).json(userData)
+        userData.token = generateJWT(userData.user_id);
+        res.status(200).json({ success: true, data: userData })
     } else {
         res.status(400)
         throw new Error('Invalid credentials')

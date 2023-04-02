@@ -33,7 +33,6 @@ const protect = asyncHandler(async (req, res, next) => {
                     GROUP BY u.id, p.project_name, p.project_code, p.is_active, r.id, r.name; `
 
             const user = await query(userQuery, [decoded.id]);
-
             delete user[0].password;
             req.user = user[0];
             if (!checkPermission(req.user.permission_ids, req.route.path, req.route.stack[0].method)) {
