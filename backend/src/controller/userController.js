@@ -144,6 +144,8 @@ const verifySuperAdminOTP = asyncHandler(async (req, res) => {
 // @Login User
 // @Route POST api/users/login
 // @access Public
+// @Nb: This login controller is called only if user not found in Redis, there's cache middleware to check if user in redis and if so cache middle ware will handle the 
+//      login controll, and only if not found request will be routed to this controller.
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     // Get user from db
