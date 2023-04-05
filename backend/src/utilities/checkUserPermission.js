@@ -1,19 +1,34 @@
-// function to check if req.user has permission to perform requesting action to get the data.
+/**************
+ * 🛡️ Permission Validation: 
+ * Lets check if user is authorized to perform requested action! *
+ **************/
+
 const checkPermission = (userPermissions, path, requestType) => {
     const userPermissionsArray = userPermissions.split(',').map(Number);
-    switch (path) {
-        case '/register-user':
-            if (requestType === 'post') {
-                return userPermissionsArray.includes(3);
-            }
-            break;
-
-        default:
-            break;
-    }
-    return false
+    const permissionValue = permissionMap[path]?.[requestType];
+    return permissionValue ? userPermissionsArray.includes(permissionValue) : false;
 }
 
+
+/**************
+ * 🛡️ Permissions ID && Path Mapping *
+ **************/
+const permissionMap = {
+    '/register-user': {
+        'post': 3,
+    },
+    '/create-account': {
+        'post': 5,
+    },
+    '/update-account': {
+        'put': 5,
+    },
+};
+
+
+/**************
+ * 🛡️ Permissions ID && Description *
+ **************/
 const permissions = {
     "1": "project_view_and_modify",
     "2": "user_management_view",
